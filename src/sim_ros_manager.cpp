@@ -26,7 +26,10 @@ SIM_DLLEXPORT int simInit(SSimInit* info)
     }
     
     // Starting ROS Node
-    rclcpp::init(0, nullptr);  // Inicializa o ROS2
+    //rclcpp::init(0, nullptr);  // Inicializa o ROS2
+    if (!rclcpp::ok())
+        rclcpp::init(0, nullptr);
+
     node = std::make_shared<CoppeliaSimRos2Manager>();
     ros_thread = std::thread(ros_spin);
 
@@ -35,7 +38,10 @@ SIM_DLLEXPORT int simInit(SSimInit* info)
 
 SIM_DLLEXPORT void simCleanup() {
     if (node) {
-        rclcpp::shutdown();
+
+        if (rclcpp::ok())
+            rclcpp::shutdown();
+
         if (ros_thread.joinable()) {
             ros_thread.join();  // Aguarda a thread terminar
         }
